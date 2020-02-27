@@ -1,27 +1,27 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "0c7834247807f89548121d99694c65b2",
+    "revision": "60c32c2608f49889c0f62b929395fec8",
     "url": "/giphy-markdown/index.html"
   },
   {
-    "revision": "c304d591d5b11c6e9878",
+    "revision": "6a3a4eb85d8ffd21a7f5",
     "url": "/giphy-markdown/static/css/2.d88ce3aa.chunk.css"
   },
   {
-    "revision": "9af67c7e797f5f288971",
+    "revision": "dd2ab5800c1d0bffda7a",
     "url": "/giphy-markdown/static/css/main.cdce6f6e.chunk.css"
   },
   {
-    "revision": "c304d591d5b11c6e9878",
-    "url": "/giphy-markdown/static/js/2.552b4d93.chunk.js"
+    "revision": "6a3a4eb85d8ffd21a7f5",
+    "url": "/giphy-markdown/static/js/2.599e6fb4.chunk.js"
   },
   {
     "revision": "bf23039b4e70a07c5aeb1b4010df3572",
-    "url": "/giphy-markdown/static/js/2.552b4d93.chunk.js.LICENSE.txt"
+    "url": "/giphy-markdown/static/js/2.599e6fb4.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "9af67c7e797f5f288971",
-    "url": "/giphy-markdown/static/js/main.94096f2f.chunk.js"
+    "revision": "dd2ab5800c1d0bffda7a",
+    "url": "/giphy-markdown/static/js/main.bc07eec3.chunk.js"
   },
   {
     "revision": "34fb663413625fd9c2e2",
