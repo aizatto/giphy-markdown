@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Input } from 'antd';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Input, Button } from 'antd';
 import debounceParent from 'lodash.debounce';
 import querystring from "querystring";
-import { GiphyFetch } from '@giphy/js-fetch-api';
+import { GiphyFetch, GifsResult } from '@giphy/js-fetch-api';
 import { IGif } from '@giphy/js-types';
 import { Images, Props } from './Images';
+import { PAGINATION_LIMIT } from '../constants';
 
 const { Search: SearchInput } = Input;
 
@@ -14,16 +15,20 @@ const debounce = debounceParent((fn: () => void) => {
   fn();
 }, 500);
 
-const fetchGifs = async (query: string, setGifs: (newResults: IGif[]) => void) => {
+const fetchGifs = async (
+  query: string,
+  offset: number,
+  appendOrSetGifs: (result: GifsResult) => void,
+) => {
   if (!query.length) {
     return;
   }
 
-  const results = await gf.search(query);
-  setGifs(results.data);
+  const results = await gf.search(query, { offset, limit: PAGINATION_LIMIT });
+  appendOrSetGifs(results);
 }
 
-function useLocalStorageState(params: querystring.ParsedUrlQuery, key: string): [string, (newValue: string) => void] {
+function useQueryStringAndLocalStorage(params: querystring.ParsedUrlQuery, key: string): [string, (newValue: string) => void] {
   const paramsArrayValue = params[key];
   const paramsValue = Array.isArray(paramsArrayValue) ? paramsArrayValue.join(' ') : paramsArrayValue;
   const defaultValue = paramsValue ?? localStorage.getItem(key);
@@ -46,16 +51,37 @@ export const Search: React.FC<Props> = (props) => {
   const [params] = useState(() => {
     return querystring.parse(window.location.search.substr(1));
   });
-  const [query, setQuery] = useLocalStorageState(params, 'query');
+  const [query, setQuery] = useQueryStringAndLocalStorage(params, 'query');
   const [gifs, setGifs] = useState<IGif[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [offset, setOffset] = useState(0);
+
+  const appendOrSetGifs = (result: GifsResult) => {
+    if (offset === 0) {
+      setGifs(result.data);
+    } else {
+      setGifs([...gifs, ...result.data]);
+    }
+    setTotalCount(result.pagination.total_count);
+  };
 
   useEffect(() => {
-    fetchGifs(query, setGifs);
-  }, [query]);
+    fetchGifs(query, offset, appendOrSetGifs);
+    // adding `appendOrSetGifs` messes things up
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, offset]);
+
+  const setQueryCallback = useCallback((newQuery: string) => {
+    const trimmedQuery = newQuery.trim();
+    if (trimmedQuery !== query) {
+      setOffset(0);
+      setQuery(trimmedQuery);
+    }
+  }, [query, setQuery]);
 
   return (
     <>
-      <h1>Search</h1>
+      <h2>Search</h2>
       <SearchInput
         placeholder="Search"
         enterButton="Search"
@@ -63,11 +89,14 @@ export const Search: React.FC<Props> = (props) => {
         defaultValue={query}
         onChange={(event) => {
           const value = event.target.value;
-          debounce(() => setQuery(value))
+          debounce(() => setQueryCallback(value))
         }}
-        onSearch={(value: string) => debounce(() => setQuery(value))}
+        onSearch={(value: string) => debounce(() => setQueryCallback(value))}
       />
       <Images images={gifs} {...props} />
+      {offset < totalCount 
+        ? <Button onClick={() => setOffset(offset + PAGINATION_LIMIT)}>Load More</Button>
+        : null}
     </>
   )
 }
