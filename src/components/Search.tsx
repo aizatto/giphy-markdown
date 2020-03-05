@@ -31,7 +31,7 @@ const fetchGifs = async (
 function useQueryStringAndLocalStorage(params: querystring.ParsedUrlQuery, key: string): [string, (newValue: string) => void] {
   const paramsArrayValue = params[key];
   const paramsValue = Array.isArray(paramsArrayValue) ? paramsArrayValue.join(' ') : paramsArrayValue;
-  const defaultValue = paramsValue ?? localStorage.getItem(key);
+  const defaultValue = paramsValue ?? localStorage.getItem(key) ?? '';
 
   const [value, setValue] = useState(defaultValue);
   const setLocalStorageState = (newValue: string) => {
